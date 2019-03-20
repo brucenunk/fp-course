@@ -71,8 +71,7 @@ foldLeft f b (h :. t) = let b' = f b h
 --
 -- prop> \x -> x `headOr` Nil == x
 headOr :: a -> List a -> a
-headOr a Nil = a
-headOr _ (t :. _) = t
+headOr = foldRight const
 
 -- | The product of the elements of a list.
 --
@@ -85,7 +84,7 @@ headOr _ (t :. _) = t
 -- >>> product (1 :. 2 :. 3 :. 4 :. Nil)
 -- 24
 product :: List Int -> Int
-product = foldLeft (*) 1
+product = foldRight (*) 1
 
 -- | Sum the elements of the list.
 --
@@ -97,7 +96,7 @@ product = foldLeft (*) 1
 --
 -- prop> \x -> foldLeft (-) (sum x) x == 0
 sum :: List Int -> Int 
-sum = foldLeft (+) 0
+sum = foldRight (+) 0
 
 -- | Return the length of the list.
 --
@@ -106,7 +105,7 @@ sum = foldLeft (+) 0
 --
 -- prop> \x -> sum (map (const 1) x) == length x
 length :: List a -> Int 
-length = foldLeft (\x _ -> x + 1) 0
+length = foldRight (const (1 +)) 0
 
 -- | Map the given function on each element of the list.
 --
@@ -117,7 +116,7 @@ length = foldLeft (\x _ -> x + 1) 0
 --
 -- prop> \x -> map id x == x
 map :: (a -> b) -> List a -> List b 
-map f = foldRight (\a b -> f a :. b) Nil
+map f = foldRight ((:.) . f) Nil
 
 -- | Return elements satisfying the given predicate.
 --
@@ -130,7 +129,7 @@ map f = foldRight (\a b -> f a :. b) Nil
 --
 -- prop> \x -> filter (const False) x == Nil
 filter :: (a -> Bool) -> List a -> List a
-filter f = foldRight (\a -> if f a then (a :.) else id) Nil
+filter f = foldRight (\x xs -> if f x then x :. xs else xs) Nil
 
 -- | Append two lists to a new list.
 --
@@ -203,12 +202,9 @@ flattenAgain = flatMap id
 -- Empty
 --
 -- >>> seqOptional (Empty :. map Full infinity)
--- Empty
-seqOptional ::
-  List (Optional a)
-  -> Optional (List a)
-seqOptional =
-  error "todo: Course.List#seqOptional"
+-- Emptys
+seqOptional :: List (Optional a) -> Optional (List a)
+seqOptional = foldRight (twiceOptional (:.)) (Full Nil)
 
 -- | Find the first element in the list matching the predicate.
 --
