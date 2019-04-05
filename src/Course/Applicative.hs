@@ -299,7 +299,9 @@ replicateA n fa = sequence $ replicate n fa
 -- [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]]
 --
 filtering :: Applicative f => (a -> f Bool) -> List a -> f (List a)
-filtering = error "todo: Course.Applicative#filtering"
+filtering p = foldRight (\a fas -> lift2 (f a) (p a) fas) (pure Nil)
+  where
+    f a b as = if b then a :. as else as
 
 -----------------------
 -- SUPPORT LIBRARIES --
