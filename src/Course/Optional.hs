@@ -23,10 +23,7 @@ data Optional a =
 --
 -- >>> mapOptional (+1) (Full 8)
 -- Full 9
-mapOptional ::
-  (a -> b)
-  -> Optional a
-  -> Optional b
+mapOptional :: (a -> b) -> Optional a -> Optional b
 mapOptional _ Empty = Empty
 mapOptional f (Full a) = Full(f a)
 
@@ -40,10 +37,7 @@ mapOptional f (Full a) = Full(f a)
 --
 -- >>> bindOptional (\n -> if even n then Full (n - 1) else Full (n + 1)) (Full 9)
 -- Full 10
-bindOptional ::
-  (a -> Optional b)
-  -> Optional a
-  -> Optional b
+bindOptional :: (a -> Optional b) -> Optional a -> Optional b
 bindOptional _ Empty = Empty
 bindOptional f (Full a) = f a
 
@@ -54,10 +48,7 @@ bindOptional f (Full a) = f a
 --
 -- >>> Empty ?? 99
 -- 99
-(??) ::
-  Optional a
-  -> a
-  -> a
+(??) :: Optional a -> a -> a
 Empty ?? a = a
 Full a ?? _ = a
  
@@ -75,10 +66,7 @@ Full a ?? _ = a
 --
 -- >>> Empty <+> Empty
 -- Empty
-(<+>) ::
-  Optional a
-  -> Optional a
-  -> Optional a
+(<+>) :: Optional a -> Optional a -> Optional a
 Empty <+> x = x
 Full a <+> _ = Full a
 
@@ -89,11 +77,7 @@ Full a <+> _ = Full a
 --
 -- >>> optional (+1) 0 Empty
 -- 0
-optional ::
-  (a -> b)
-  -> b
-  -> Optional a
-  -> b
+optional :: (a -> b) -> b -> Optional a -> b
 optional _ b Empty = b
 optional f _ (Full a) = f a
 
