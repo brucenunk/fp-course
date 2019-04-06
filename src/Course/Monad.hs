@@ -106,7 +106,7 @@ infixl 4 <**>
 -- >>> join (+) 7
 -- 14
 join :: Monad f => f (f a) -> f a
-join = error "todo: Course.Monad#join"
+join ffa = id =<< ffa
 
 -- | Implement a flipped version of @(=<<)@, however, use only
 -- @join@ and @(<$>)@.
