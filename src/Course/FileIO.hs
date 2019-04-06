@@ -82,15 +82,15 @@ the contents of c
 -- Given the file name, and file contents, print them.
 -- Use @putStrLn@.
 printFile :: FilePath -> Chars -> IO ()
-printFile fp c =
-  putStrLn ("============ " ++ fp) >>= \_ ->
-    putStrLn c
+printFile fp c = do
+  putStrLn ("============ " ++ fp)
+  putStrLn c
 
 -- Given a list of (file name and file contents), print each.
 -- Use @printFile@.
 printFiles :: List (FilePath, Chars) -> IO ()
 printFiles xs =
-  void $ sequence (uncurry printFile <$> xs)
+  void (sequence (uncurry printFile <$> xs))
 
 -- Given a file name, return (file name and file contents).
 -- Use @readFile@.
@@ -107,21 +107,22 @@ getFiles =
 -- Given a file name, read it and for each line in that file, read and print contents of each.
 -- Use @getFiles@ and @printFiles@.
 run :: FilePath -> IO ()
-run fp =
-  readFile fp >>= \contents ->
-    getFiles (lines contents) >>= printFiles
+run fp = do
+  contents <- readFile fp
+  files <- getFiles (lines contents)
+  printFiles files
 
 -- /Tip:/ use @getArgs@ and @run@
 main :: IO ()
-main =
-  getArgs >>= \args ->
-    case args of
-      Nil       -> putStrLn "no args!"
-      arg0 :. _ -> run arg0
+main = do
+  args <- getArgs
+  case args of
+    Nil       -> putStrLn "no args!"
+    arg0 :. _ -> run arg0
 
 ----
 
 -- Was there was some repetition in our solution?
--- ? `sequence . (<$>)`
--- ? `void . sequence . (<$>)`
+-- ? `sequence . (<$>)`           => traverse
+-- ? `void . sequence . (<$>)`    => traverse_
 -- Factor it out.
