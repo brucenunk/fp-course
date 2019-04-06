@@ -88,7 +88,7 @@ instance Monad ((->) t) where
 -- >>> ((*) <**> (+2)) 3
 -- 15
 (<**>) :: Monad f => f (a -> b) -> f a -> f b
-(<**>) fab fa = fab >>= (<$> fa)
+(<**>) fab fa = (<$> fa) =<< fab
 
 infixl 4 <**>
 
@@ -106,7 +106,7 @@ infixl 4 <**>
 -- >>> join (+) 7
 -- 14
 join :: Monad f => f (f a) -> f a
-join ffa = id =<< ffa
+join = (id =<<)
 
 -- | Implement a flipped version of @(=<<)@, however, use only
 -- @join@ and @(<$>)@.
@@ -115,7 +115,7 @@ join ffa = id =<< ffa
 -- >>> ((+10) >>= (*)) 7
 -- 119
 (>>=) :: Monad f => f a -> (a -> f b) -> f b
-(>>=) = error "todo: Course.Monad#(>>=)"
+(>>=) = flip (=<<)
 
 infixl 1 >>=
 
@@ -125,7 +125,7 @@ infixl 1 >>=
 -- >>> ((\n -> n :. n :. Nil) <=< (\n -> n+1 :. n+2 :. Nil)) 1
 -- [2,2,3,3]
 (<=<) :: Monad f => (b -> f c) -> (a -> f b) -> a -> f c
-(<=<) = error "todo: Course.Monad#(<=<)"
+(<=<) bfc afb a = bfc =<< afb a
 
 infixr 1 <=<
 
