@@ -54,7 +54,7 @@ instance Monad Optional where
 -- 119
 instance Monad ((->) t) where
   (=<<) :: (a -> t -> b) -> (t -> a) -> t -> b
-  (=<<) atb ta t = atb (ta t) t
+  (=<<) f g t = f (g t) t
 
 -- | Witness that all things with (=<<) and (<$>) also have (<*>).
 --
@@ -88,7 +88,7 @@ instance Monad ((->) t) where
 -- >>> ((*) <**> (+2)) 3
 -- 15
 (<**>) :: Monad f => f (a -> b) -> f a -> f b
-(<**>) fab fa = (<$> fa) =<< fab
+(<**>) f fa = (<$> fa) =<< f
 
 infixl 4 <**>
 
@@ -125,7 +125,7 @@ infixl 1 >>=
 -- >>> ((\n -> n :. n :. Nil) <=< (\n -> n+1 :. n+2 :. Nil)) 1
 -- [2,2,3,3]
 (<=<) :: Monad f => (b -> f c) -> (a -> f b) -> a -> f c
-(<=<) bfc afb a = bfc =<< afb a
+(<=<) f g a = f =<< g a
 
 infixr 1 <=<
 
