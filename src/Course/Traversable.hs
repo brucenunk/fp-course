@@ -29,7 +29,7 @@ class Functor g => Traversable g where
 
 instance Traversable ExactlyOne where
   traverse :: Applicative f => (a -> f b) -> ExactlyOne a -> f (ExactlyOne b)
-  traverse f ea = ExactlyOne <$> f (runExactlyOne ea)
+  traverse f (ExactlyOne a) = ExactlyOne <$> f a
 
 instance Traversable List where
   traverse :: Applicative f => (a -> f b) -> List a -> f (List b)
