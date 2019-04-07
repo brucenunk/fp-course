@@ -58,7 +58,7 @@ instance Applicative List where
 
   (<*>) :: List (a -> b) -> List a -> List b
   (<*>) ff fa = flatMap (flip map fa) ff
-  
+
   -- | Insert into an Optional.
 --
 -- prop> \x -> pure x == Full x
@@ -101,7 +101,7 @@ instance Applicative ((->) t) where
   pure = const
 
   (<*>) :: (t -> a -> b) -> (t -> a) -> (t -> b)
-  (<*>) tab ta t = tab t (ta t)
+  (<*>) f g t = f t (g t)
 
 
 -- | Apply a nullary function in the environment.
@@ -276,7 +276,7 @@ sequence = foldRight (lift2 (:.)) (pure Nil)
 -- >>> replicateA 3 ('a' :. 'b' :. 'c' :. Nil)
 -- ["aaa","aab","aac","aba","abb","abc","aca","acb","acc","baa","bab","bac","bba","bbb","bbc","bca","bcb","bcc","caa","cab","cac","cba","cbb","cbc","cca","ccb","ccc"]
 replicateA :: Applicative f => Int -> f a -> f (List a)
-replicateA n fa = sequence $ replicate n fa
+replicateA n = sequence . replicate n
 
 -- | Filter a list with a predicate that produces an effect.
 --
@@ -299,9 +299,7 @@ replicateA n fa = sequence $ replicate n fa
 -- [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]]
 --
 filtering :: Applicative f => (a -> f Bool) -> List a -> f (List a)
-filtering p = foldRight (\a fas -> lift2 (f a) (p a) fas) (pure Nil)
-  where
-    f a b as = if b then a :. as else as
+filtering p = foldRight (\a -> lift2 (\b -> if b then (a :.) else id) (p a)) (pure Nil)
 
 -----------------------
 -- SUPPORT LIBRARIES --
